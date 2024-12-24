@@ -48,7 +48,7 @@ function Header() {
       </NavbarContent>
       <NavbarContent justify="center" className="hidden sm:flex">
         {MenuList.map((item, index) => (
-          <NavbarItem className="text-xl text-primary font-medium hover:underline mx-2">
+          <NavbarItem key={index} className="text-xl text-primary font-medium hover:underline mx-2">
             <Link href={item.path}>{item.name}</Link>
           </NavbarItem>
         ))}
@@ -58,7 +58,7 @@ function Header() {
       </NavbarContent>
       <NavbarMenu>
         {MenuList.map((item, index) => (
-          <NavbarMenuItem>
+          <NavbarMenuItem key={index}>
             <Link href={item.path}>{item.name}</Link>
           </NavbarMenuItem>
         ))}
