@@ -6,6 +6,10 @@ import AgeGroup from "./_components/AgeGroup";
 import ImageStyle from "./_components/ImageStyle";
 import { Button } from "@nextui-org/button";
 import { chatSession } from "@/config/GeminiAi";
+import { db } from "@/config/db";
+import { StoryData } from "@/config/schema";
+//@ts-ignore
+import uuid4 from "uuid4";
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 export interface fieldData {
@@ -48,8 +52,9 @@ function CreateStory() {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
       console.log(result?.response.text());
       // Save in DB
-      SaveInDB(result?.response.text());
       
+      const resp = await SaveInDB(result?.response.text());
+      console.log(resp);
       setLoading(false);
     } catch (e) {
       console.log(e);
@@ -60,8 +65,28 @@ function CreateStory() {
     // Generate Image
   };
 
-  const SaveInDB=(output:string)=>{
-
+  /**
+   * Save Data in Database
+   * @param output AI output
+   * @returns 
+   */
+  const SaveInDB=async(output:string)=>{
+    const recordId = uuid4();
+    setLoading(true);
+    try {
+      const result = await db.insert(StoryData).values({
+        storyId:recordId,
+        ageGroup:formData?.ageGroup,
+        imageStyle:formData?.imageStyle,
+        storySubject:formData?.storySubject,
+        storyType:formData?.storyType,
+        output:JSON.parse(output)
+      }).returning({storyId:StoryData?.storyId})
+      setLoading(false);
+      return result;
+    } catch (e) {
+      setLoading(false);
+    }
   }
 
   return (
