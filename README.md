@@ -49,8 +49,11 @@ Các công cụ hỗ trợ
 
 [5]: <https://ai.google.dev/>
 
+[6]: <https://www.flaticon.com/>
+
 - [NextUI][1]
 - [Clerk][2]
 - [drizzle][3]: PostgreSQL
 - [neon][4]
 - [Gemini AI][5]
+- [Flaticon][6]
