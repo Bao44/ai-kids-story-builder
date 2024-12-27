@@ -5,7 +5,9 @@ import StoryType from "./_components/StoryType";
 import AgeGroup from "./_components/AgeGroup";
 import ImageStyle from "./_components/ImageStyle";
 import { Button } from "@nextui-org/button";
+import { chatSession } from "@/config/GeminiAi";
 
+const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 export interface fieldData {
   fieldName: string;
   fieldValue: string;
@@ -20,10 +22,11 @@ export interface formDataType {
 
 function CreateStory() {
   const [formData, setFormData] = useState<formDataType>();
-  
+  const [loading, setLoading] = useState(false);
+
   /**
    * used to add data to form
-   * @param data 
+   * @param data
    */
   const onHandleUserSelection = (data: fieldData) => {
     setFormData((prev: any) => ({
@@ -32,6 +35,34 @@ function CreateStory() {
     }));
     console.log(formData);
   };
+
+  const GenerateStory = async () => {
+    setLoading(true);
+    const FINAL_PROMPT = CREATE_STORY_PROMPT
+      ?.replace("{ageGroup}", formData?.ageGroup ?? "")
+      .replace("{storyType}", formData?.storyType ?? "")
+      .replace("{imageStyle}", formData?.imageStyle ?? "")
+      .replace("{storySubject}", formData?.storySubject ?? "");
+    // Generate AI Story
+    try {
+      const result = await chatSession.sendMessage(FINAL_PROMPT);
+      console.log(result?.response.text());
+      // Save in DB
+      SaveInDB(result?.response.text());
+      
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+      setLoading(false);
+    }
+    
+
+    // Generate Image
+  };
+
+  const SaveInDB=(output:string)=>{
+
+  }
 
   return (
     <div className="p-10 md:px-20 lg:px-40">
@@ -55,7 +86,12 @@ function CreateStory() {
       </div>
 
       <div className="flex justify-end my-10">
-        <Button color="primary" className="p-10 text-2xl">
+        <Button
+          color="primary"
+          className="p-10 text-2xl"
+          disabled={loading}
+          onClick={GenerateStory}
+        >
           Generate Story
         </Button>
       </div>

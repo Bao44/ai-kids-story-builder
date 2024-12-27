@@ -47,7 +47,10 @@ Các công cụ hỗ trợ
 
 [4]: <https://neon.tech/>
 
+[5]: <https://ai.google.dev/>
+
 - [NextUI][1]
 - [Clerk][2]
 - [drizzle][3]: PostgreSQL
 - [neon][4]
+- [Gemini AI][5]
