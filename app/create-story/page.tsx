@@ -11,6 +11,9 @@ import { StoryData } from "@/config/schema";
 //@ts-ignore
 import uuid4 from "uuid4";
 import CustomLoader from "./_components/CustomLoader";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 export interface fieldData {
@@ -28,6 +31,10 @@ export interface formDataType {
 function CreateStory() {
   const [formData, setFormData] = useState<formDataType>();
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const notify = (msg:string) => toast(msg);
+  const notifyError = (msg:string) => toast.error(msg);
+  const {user} = useUser();
 
   /**
    * used to add data to form
@@ -51,19 +58,25 @@ function CreateStory() {
     // Generate AI Story
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
-      console.log(result?.response.text());
+
+      const story = JSON.parse(result?.response.text());
+
+
       // Save in DB
       
-      const resp = await SaveInDB(result?.response.text());
+      const resp:any = await SaveInDB(result?.response.text());
       console.log(resp);
+      notify("Story Generated Successfully");
+      router?.replace('/view-story/' + resp[0]?.storyId);
+
       setLoading(false);
     } catch (e) {
       console.log(e);
+      notifyError("Error in Generating Story, Try again");
       setLoading(false);
     }
     
 
-    // Generate Image
   };
 
   /**
@@ -81,7 +94,11 @@ function CreateStory() {
         imageStyle:formData?.imageStyle,
         storySubject:formData?.storySubject,
         storyType:formData?.storyType,
-        output:JSON.parse(output)
+        output:JSON.parse(output),
+
+        userEmail:user?.primaryEmailAddress?.emailAddress,
+        userImage:user?.imageUrl,
+        userName:user?.fullName
       }).returning({storyId:StoryData?.storyId})
       setLoading(false);
       return result;
@@ -127,3 +144,6 @@ function CreateStory() {
 }
 
 export default CreateStory;
+
+
+// 2 41 40
