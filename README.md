@@ -53,10 +53,11 @@ Các công cụ hỗ trợ
 
 [7]: <https://replicate.com/>
 
+
 - [NextUI][1]
 - [Clerk][2]
 - [drizzle][3]: PostgreSQL
 - [neon][4]
 - [Gemini AI][5]
 - [Flaticon][6]
-- [Replicate][7]: Tạo hình AI `Free với hạn mức sử dụng nhất định`
+- [Replicate][7]: Tạo hình AI `Mất phí nên không áp dụng`
