@@ -51,7 +51,9 @@ Các công cụ hỗ trợ
 
 [6]: <https://www.flaticon.com/>
 
-[7]: <https://replicate.com/>
+[7]: <https://react-icons.github.io/react-icons/>
+
+[8]: <https://replicate.com/>
 
 
 - [NextUI][1]
@@ -60,4 +62,5 @@ Các công cụ hỗ trợ
 - [neon][4]
 - [Gemini AI][5]
 - [Flaticon][6]
-- [Replicate][7]: Tạo hình AI `Mất phí nên không áp dụng`
+- [React-icons][7]
+- [Replicate][8]: Tạo hình AI `Mất phí nên không áp dụng`
