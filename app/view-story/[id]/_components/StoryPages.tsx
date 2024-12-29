@@ -2,6 +2,7 @@ import React from "react";
 import { MdOutlinePlayCircleFilled } from "react-icons/md";
 
 function StoryPages({ storyChapter }: any) {
+  
   const playSpeech = (text: string) => {
     const synth = window?.speechSynthesis;
     const textToSpeech = new SpeechSynthesisUtterance(text);
