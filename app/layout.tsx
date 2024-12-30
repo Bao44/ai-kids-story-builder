@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Provider from "./provider";
-import {Nunito} from 'next/font/google'
+import { Nunito } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 
-const MyAppFont = Nunito({subsets:['latin']});
+const MyAppFont = Nunito({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,12 +18,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={MyAppFont.className}
-      >
-        <Provider>{children}</Provider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={MyAppFont.className}>
+          <Provider>{children}</Provider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import StorySubjectInput from "./_components/StorySubjectInput";
 import StoryType from "./_components/StoryType";
 import AgeGroup from "./_components/AgeGroup";
@@ -7,13 +7,15 @@ import ImageStyle from "./_components/ImageStyle";
 import { Button } from "@nextui-org/button";
 import { chatSession } from "@/config/GeminiAi";
 import { db } from "@/config/db";
-import { StoryData } from "@/config/schema";
+import { StoryData, Users } from "@/config/schema";
 //@ts-ignore
 import uuid4 from "uuid4";
 import CustomLoader from "./_components/CustomLoader";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { UserDetailContext } from "../_context/UserDetailContext";
+import { eq } from "drizzle-orm";
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 export interface fieldData {
@@ -32,9 +34,10 @@ function CreateStory() {
   const [formData, setFormData] = useState<formDataType>();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const notify = (msg:string) => toast(msg);
-  const notifyError = (msg:string) => toast.error(msg);
-  const {user} = useUser();
+  const notify = (msg: string) => toast(msg);
+  const notifyError = (msg: string) => toast.error(msg);
+  const { user } = useUser();
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
   /**
    * used to add data to form
@@ -49,9 +52,16 @@ function CreateStory() {
   };
 
   const GenerateStory = async () => {
+    if (userDetail.credit <= 0) {
+      notifyError("You don't have enough credits!");
+      return;
+    }
+
     setLoading(true);
-    const FINAL_PROMPT = CREATE_STORY_PROMPT
-      ?.replace("{ageGroup}", formData?.ageGroup ?? "")
+    const FINAL_PROMPT = CREATE_STORY_PROMPT?.replace(
+      "{ageGroup}",
+      formData?.ageGroup ?? ""
+    )
       .replace("{storyType}", formData?.storyType ?? "")
       .replace("{imageStyle}", formData?.imageStyle ?? "")
       .replace("{storySubject}", formData?.storySubject ?? "");
@@ -61,51 +71,60 @@ function CreateStory() {
 
       const story = JSON.parse(result?.response.text());
 
-
       // Save in DB
-      
-      const resp:any = await SaveInDB(result?.response.text());
-      console.log(resp);
-      notify("Story Generated Successfully");
-      router?.replace('/view-story/' + resp[0]?.storyId);
 
+      const resp: any = await SaveInDB(result?.response.text());
+      notify("Story Generated Successfully");
+      await UpdateUserCredits();
+      router?.replace("/view-story/" + resp[0]?.storyId);
       setLoading(false);
     } catch (e) {
       console.log(e);
       notifyError("Error in Generating Story, Try again");
       setLoading(false);
     }
-    
-
   };
 
   /**
    * Save Data in Database
    * @param output AI output
-   * @returns 
+   * @returns
    */
-  const SaveInDB=async(output:string)=>{
+  const SaveInDB = async (output: string) => {
     const recordId = uuid4();
     setLoading(true);
     try {
-      const result = await db.insert(StoryData).values({
-        storyId:recordId,
-        ageGroup:formData?.ageGroup,
-        imageStyle:formData?.imageStyle,
-        storySubject:formData?.storySubject,
-        storyType:formData?.storyType,
-        output:JSON.parse(output),
+      const result = await db
+        .insert(StoryData)
+        .values({
+          storyId: recordId,
+          ageGroup: formData?.ageGroup,
+          imageStyle: formData?.imageStyle,
+          storySubject: formData?.storySubject,
+          storyType: formData?.storyType,
+          output: JSON.parse(output),
 
-        userEmail:user?.primaryEmailAddress?.emailAddress,
-        userImage:user?.imageUrl,
-        userName:user?.fullName
-      }).returning({storyId:StoryData?.storyId})
+          userEmail: user?.primaryEmailAddress?.emailAddress,
+          userImage: user?.imageUrl,
+          userName: user?.fullName,
+        })
+        .returning({ storyId: StoryData?.storyId });
       setLoading(false);
       return result;
     } catch (e) {
       setLoading(false);
     }
-  }
+  };
+
+  const UpdateUserCredits = async () => {
+    const result = await db
+      .update(Users)
+      .set({
+        credit: Number(userDetail?.credit - 1),
+      })
+      .where(eq(Users.userEmail, user?.primaryEmailAddress?.emailAddress ?? ""))
+      .returning({ id: Users.id });
+  };
 
   return (
     <div className="p-10 md:px-20 lg:px-40">
@@ -128,7 +147,7 @@ function CreateStory() {
         <ImageStyle userSelection={onHandleUserSelection} />
       </div>
 
-      <div className="flex justify-end my-10">
+      <div className="flex justify-end my-10 flex-col items-end">
         <Button
           color="primary"
           className="p-10 text-2xl"
@@ -137,8 +156,9 @@ function CreateStory() {
         >
           Generate Story
         </Button>
+        <span>1 Credit will user</span>
       </div>
-      <CustomLoader isLoading={loading}/>
+      <CustomLoader isLoading={loading} />
     </div>
   );
 }
