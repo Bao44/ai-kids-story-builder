@@ -17,7 +17,6 @@ function ViewStory({ params }: any) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    console.log(params.id);
     getStory();
   }, []);
 
@@ -27,7 +26,6 @@ function ViewStory({ params }: any) {
       .from(StoryData)
       .where(eq(StoryData.storyId, params.id));
 
-    console.log(result);
     setStory(result[0]);
   };
   return (
