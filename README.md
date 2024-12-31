@@ -55,6 +55,7 @@ Các công cụ hỗ trợ
 
 [8]: <https://replicate.com/>
 
+[9]: <https://developer.paypal.com/home/>
 
 - [NextUI][1]
 - [Clerk][2]
@@ -64,3 +65,4 @@ Các công cụ hỗ trợ
 - [Flaticon][6]
 - [React-icons][7]
 - [Replicate][8]: Tạo hình AI `Mất phí nên không áp dụng`
+- [Paypal][9]

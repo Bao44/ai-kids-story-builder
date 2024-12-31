@@ -9,6 +9,7 @@ import { db } from "@/config/db";
 import { Users } from "@/config/schema";
 import { eq } from "drizzle-orm";
 import { UserDetailContext } from "./_context/UserDetailContext";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 function Provider({ children }: { children: React.ReactNode }) {
   const [userDetail, setUserDetail] = useState<any>();
@@ -50,12 +51,14 @@ function Provider({ children }: { children: React.ReactNode }) {
 
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
-      <NextUIProvider>
-        {/* Header */}
-        <Header />
-        {children}
-        <ToastContainer />
-      </NextUIProvider>
+      <PayPalScriptProvider options={{ clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID??'' }}>
+        <NextUIProvider>
+          {/* Header */}
+          <Header />
+          {children}
+          <ToastContainer />
+        </NextUIProvider>
+      </PayPalScriptProvider>
     </UserDetailContext.Provider>
   );
 }
