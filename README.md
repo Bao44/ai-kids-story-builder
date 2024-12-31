@@ -1,7 +1,8 @@
 ## Deploy on Vercel
 
-#### [Click Here](ai-kids-story-builder-b44.vercel.app) to view
-
+```bash 
+ai-kids-story-builder-b44.vercel.app
+```
 --- 
 
 #### Support tools
