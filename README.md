@@ -1,8 +1,6 @@
 ## Deploy on Vercel
 
-[10]: <ai-kids-story-builder-b44.vercel.app>
-
-#### [Click Here][10] to view
+#### [Click Here](ai-kids-story-builder-b44.vercel.app) to view
 
 --- 
 
